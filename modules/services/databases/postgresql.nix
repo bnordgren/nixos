@@ -12,12 +12,12 @@ let
     else pkgs.buildEnv {
       name = "postgresql-and-plugins";
       paths = [ pg ] ++ cfg.extraPlugins;
-      postBuild =
-        ''
-          mkdir -p $out/bin
-          rm $out/bin/{pg_config,postgres,pg_ctl}
-          cp --target-directory=$out/bin ${pg}/bin/{postgres,pg_config,pg_ctl}
-        '';
+      #postBuild =
+      #  ''
+      #    mkdir -p $out/bin
+      #    rm -f $out/bin/{pg_config,postgres,pg_ctl}
+      #    cp --target-directory=$out/bin ${pg}/bin/{postgres,pg_config,pg_ctl}
+      #  '';
     };
 
   postgresql = postgresqlAndPlugins pkgs.postgresql;
