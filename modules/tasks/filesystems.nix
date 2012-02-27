@@ -173,8 +173,10 @@ in
         script =
           ''
             exec > /dev/console 2>&1
-            echo "mounting filesystems..."
             export PATH=${config.system.sbin.mount}/bin:${makeSearchPath "sbin" ([pkgs.utillinux] ++ fsPackages)}:$PATH
+            echo "mounting filesystems..."
+            ${config.system.sbin.modprobe}/sbin/modprobe btrfs
+            ${pkgs.btrfsProgs}/bin/btrfs device scan
             ${pkgs.mountall}/sbin/mountall
           '';
       };
