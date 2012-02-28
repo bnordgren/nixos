@@ -71,6 +71,11 @@ in
         description = "Whether users are excluded.";
       };
 
+      additionalConfig = mkOption {
+        default = " " ; 
+        description = "Any additional configuration options." ; 
+      } ; 
+
     };
 
   };
@@ -100,10 +105,17 @@ in
       };
 
     jobs.vsftpd =
+     let 
+        uploadDirCmd = if cfg.anonymousUploadEnable then ''
+	    mkdir -p ${cfg.anonymousUserHome}/upload
+            chmod 755 ${cfg.anonymousUserHome}/upload
+	  '' else "" ; 
+     in
       { description = "vsftpd server";
 
         startOn = "started network-interfaces";
         stopOn = "stopping network-interfaces";
+
 
         preStart =
           ''
@@ -117,6 +129,7 @@ in
             ${yesNoOption cfg.chrootlocalUser "chroot_local_user"}
             ${yesNoOption cfg.userlistEnable "userlist_enable"}
             ${yesNoOption cfg.userlistDeny "userlist_deny"}
+            ${cfg.additionalConfig}
             background=NO
             listen=YES
             nopriv_user=vsftpd
@@ -124,8 +137,10 @@ in
             EOF
 
             ${if cfg.anonymousUser then ''
-              mkdir -p -m 555 ${cfg.anonymousUserHome}
-              chown -R ftp:ftp ${cfg.anonymousUserHome}
+                mkdir -p ${cfg.anonymousUserHome}
+                chmod 555 ${cfg.anonymousUserHome}
+              '' + uploadDirCmd + ''
+                chown -R ftp:ftp ${cfg.anonymousUserHome}
             '' else ""}
           '';
 
